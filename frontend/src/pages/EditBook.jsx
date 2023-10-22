@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import BackButton from '../components/BackButton';
 import Spinner from '../components/Spinner';
+import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 const EditBook = () => {
   const [title, setTitle] = useState('');
@@ -10,23 +11,24 @@ const EditBook = () => {
   const [publishYear, setPublishYear] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { id } = useParams();
+  const {id} = useParams();
+  const { enqueueSnackbar } = useSnackbar();
+
   useEffect(() => {
     setLoading(true);
     axios.get(`http://localhost:5555/books/${id}`)
-      .then((response) => {
+    .then((response) => {
         setAuthor(response.data.author);
-        setPublishYear(response.data.publishYear);
-        setTitle(response.data.title);
+        setPublishYear(response.data.publishYear)
+        setTitle(response.data.title)
         setLoading(false);
-      })
-      .catch((error) => {
+      }).catch((error) => {
         setLoading(false);
-        alert('An error happened. Please Check console')
+        alert('An error happened. Please Chack console');
         console.log(error);
-        
       });
-  }, []);
+  }, [])
+  
   const handleEditBook = () => {
     const data = {
       title,
@@ -38,13 +40,14 @@ const EditBook = () => {
       .put(`http://localhost:5555/books/${id}`, data)
       .then(() => {
         setLoading(false);
+        enqueueSnackbar('Book Edited successfully', { variant: 'success' });
         navigate('/');
       })
       .catch((error) => {
         setLoading(false);
-        alert('An error happened. Please Check console!');
+        // alert('An error happened. Please Chack console');
+        enqueueSnackbar('Error', { variant: 'error' });
         console.log(error);
-        
       });
   };
 
@@ -57,29 +60,29 @@ const EditBook = () => {
         <div className='my-4'>
           <label className='text-xl mr-4 text-gray-500'>Title</label>
           <input
-            tpe='text'
+            type='text'
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className='border-2 border-gray-500 px-4 py-2 w-full'
-            />
+          />
         </div>
         <div className='my-4'>
           <label className='text-xl mr-4 text-gray-500'>Author</label>
           <input
-            tpe='text'
+            type='text'
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            className='border-2 border-gray-500 px-4 py-2 w-full'
-            />
+            className='border-2 border-gray-500 px-4 py-2  w-full '
+          />
         </div>
         <div className='my-4'>
           <label className='text-xl mr-4 text-gray-500'>Publish Year</label>
           <input
-            tpe='text'
+            type='number'
             value={publishYear}
             onChange={(e) => setPublishYear(e.target.value)}
-            className='border-2 border-gray-500 px-4 py-2 w-full'
-            />
+            className='border-2 border-gray-500 px-4 py-2  w-full '
+          />
         </div>
         <button className='p-2 bg-sky-300 m-8' onClick={handleEditBook}>
           Save
@@ -89,4 +92,4 @@ const EditBook = () => {
   )
 }
 
-export default EditBook;
+export default EditBook
